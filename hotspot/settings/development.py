@@ -177,7 +177,7 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-API_KEY = "AIzaSyD2M7OqRsXGYLH2zR9ieZMSJ2lKoxXPVgA"
+API_KEY = "XXXXXXXXXXXXXXXXXX"
 BASE_URL = "https://www.googleapis.com/youtube/"
 
 

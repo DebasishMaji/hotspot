@@ -3,7 +3,7 @@ import requests
 
 
 class YouTubeV3Data(object):
-    API_KEY = "AIzaSyD2M7OqRsXGYLH2zR9ieZMSJ2lKoxXPVgA"
+    API_KEY = "XXXXXXXXXXXXXX"
     BASE_URL = "https://www.googleapis.com/youtube/"
 
     def __init__(self):
@@ -15,7 +15,7 @@ class YouTubeV3Data(object):
         query = {
             "type": "video",
             "order": "date",
-            "key": "AIzaSyD2M7OqRsXGYLH2zR9ieZMSJ2lKoxXPVgA"
+            "key": "XXXXXXXXXXXXXXXX"
             # "publishedAfter": publishedAfter
         }
 
