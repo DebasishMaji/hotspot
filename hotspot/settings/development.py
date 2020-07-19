@@ -11,6 +11,9 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 
 import os
+import sys
+import mongoengine
+
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -38,7 +41,10 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    'hotspot',
     'rest_framework',
+    'rest_framework_mongoengine',
+    'django_celery_beat'
 ]
 
 MIDDLEWARE = [
@@ -80,12 +86,57 @@ WSGI_APPLICATION = 'hotspot.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
+# Set database settings to None
+# Kept an sqlite3 database just to keep django happy - e.g. django tests will fail with dummy database
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': '',
+        'NAME': '',
     }
 }
+# Configure Mongo as database. Replace below values as required
+
+# Defined 2 Mongo databases - default and test
+MONGODB_DATABASES = {
+    "default": {
+        "name": "hotspot",
+        "host": "localhost",
+        "port": 27017,
+        "tz_aware": True,  # if you use timezones in django (USE_TZ = True)
+    },
+
+    "test": {
+        "name": "test",
+        "host": "localhost",
+        "port": 27017,
+        "tz_aware": True,  # if you use timezones in django (USE_TZ = True)
+    }
+}
+
+
+def is_test():
+    """
+    Checks, if we're running the server for real or in unit-test.
+    We might need a better implementation of this function.
+    """
+    if 'test' in sys.argv or 'testserver' in sys.argv:
+        return True
+    else:
+        return False
+
+
+if is_test():
+    db = 'test'
+else:
+    db = 'default'
+
+
+# establish connection with default or test database, depending on the management command, being run
+# note that this connection syntax is correct for mongoengine0.9-, but mongoengine0.10+ introduced slight changes
+mongoengine.connect(
+    db=MONGODB_DATABASES[db]['name'],
+    host=MONGODB_DATABASES[db]['host']
+)
 
 
 # Password validation
@@ -125,3 +176,17 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
 STATIC_URL = '/static/'
+
+API_KEY = "AIzaSyD2M7OqRsXGYLH2zR9ieZMSJ2lKoxXPVgA"
+BASE_URL = "https://www.googleapis.com/youtube/"
+
+
+# RabbitMQ settings
+
+RABBITMQ_CELERY_MESSAGE_BROKER_CONFIG = {
+    "user": os.environ["rabbitmq_user"],
+    "password": os.environ["rabbitmq_pass"],
+    "host": os.environ["rabbitmq_host"],
+    "port": os.environ["rabbitmq_port"],
+}
+
